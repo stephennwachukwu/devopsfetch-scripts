@@ -11,7 +11,7 @@ sudo apt-get update
 sudo apt-get install -y net-tools nginx docker.io jq
 
 # Copy the devops script to /usr/local/bin/ and Make devopsfetch executable
-cp devopsfetch /usr/local/bin/
+cp devopsfetch.sh /usr/local/bin/devopsfetch
 chmod +x /usr/local/bin/devopsfetch
 
 # Create systemd service

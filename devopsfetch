@@ -14,9 +14,9 @@ display_help() {
 	echo "  -h, --help           Display this help message"
 }
 
-# Function to display ports
+#display ports
 display_ports() {
-	echo "USER PORT SERVICE"
+	echo -e "USER\tPORT\tSERVICE"
 	if [ -z "$1" ]; then
 		ss -tuln | awk 'NR>1 {split($5, a, ":"); print a[length(a)]}' | sort -u | while read port; do
 			lsof -i :$port -sTCP:LISTEN -n -P 2>/dev/null | awk 'NR>1 {print $3, $9, $1}' | awk -v p=$port '{split($2, a, ":"); if (a[length(a)] == p) print $1, p, $3}' | sort -u
@@ -26,25 +26,25 @@ display_ports() {
 	fi | column -t
 }
 
-# Function to display Docker info
+#display Docker info
 display_docker() {
 	if [ -z "$1" ]; then
 		docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Image}}\t{{.ID}}"
 	else
-		docker inspect "$1" | jq '.[0] | {Name: .Name, State: .State.Status, Image: .Config.Image, ID: .Id}'
+		docker inspect "$1" | jq '.[0] | {Name: .Name, State: .State.Status, Image: .Config.Image, ID: .Id}' | column -t
 	fi
 }
 
-# Function to display Nginx info
+#display Nginx info
 display_nginx() {
 	if [ -z "$1" ]; then
 		grep -R server_name /etc/nginx/sites-enabled/ | awk '{print $2 " " $3}' | sed 's/;//' | column -t
 	else
-		grep -R -A 10 "server_name $1" /etc/nginx/sites-enabled/
+		grep -R -A 10 "server_name $1" /etc/nginx/sites-enabled/ | column -t
 	fi
 }
 
-# Function to display user info
+#display user info
 display_users() {
 	if [ -z "$1" ]; then
 		last | head -n 10 | column -t
@@ -58,11 +58,9 @@ display_time_range() {
 		echo "Please specify a time range or date"
 		return 1
 	elif [ $# -eq 1 ]; then
-		# Single date provided
 		start_date=$(date -d "$1" +"%Y-%m-%d 00:00:00")
 		end_date=$(date -d "$1 + 1 day" +"%Y-%m-%d 00:00:00")
 	elif [ $# -eq 2 ]; then
-		# Date range provided
 		start_date=$(date -d "$1" +"%Y-%m-%d 00:00:00")
 		end_date=$(date -d "$2 + 1 day" +"%Y-%m-%d 00:00:00")
 	else
@@ -70,8 +68,7 @@ display_time_range() {
 		return 1
 	fi
 
-	# Use journalctl to display logs within the specified time range
-	journalctl --since "$start_date" --until "$end_date"
+	journalctl --since "$start_date" --until "$end_date" | column -t
 }
 
 # Main logic
