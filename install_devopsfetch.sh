@@ -11,7 +11,7 @@ sudo apt-get update
 sudo apt-get install -y net-tools nginx docker.io jq
 
 # Copy the devops script to /usr/local/bin/ and Make devopsfetch executable
-cp devopsfetch /usr/local/bin/devopsfetch
+cp devopsfetch.sh /usr/local/bin/devopsfetch
 chmod +x /usr/local/bin/devopsfetch
 
 # Create systemd service
@@ -30,9 +30,9 @@ WantedBy=multi-user.target
 EOF
 
 # Reload systemd and start the service
-sudo systemctl daemon-reload
-sudo systemctl enable devopsfetch.service
-sudo systemctl start devopsfetch.service
+systemctl daemon-reload
+systemctl enable devopsfetch.service
+systemctl start devopsfetch.service
 
 # Setup log rotation
 cat <<EOF | sudo tee /etc/logrotate.d/devopsfetch
@@ -44,6 +44,9 @@ cat <<EOF | sudo tee /etc/logrotate.d/devopsfetch
     missingok
     notifempty
     create 0640 root root
+    postrotate
+        systemctl reload devopsfetch.service > /dev/null 2>/dev/null || true
+    endscript
 }
 EOF
 
