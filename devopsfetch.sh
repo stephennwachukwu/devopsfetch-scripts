@@ -82,7 +82,8 @@ display_time_range() {
 		return 1
 	fi
 
-	journalctl --since "$start_date" --until "$end_date" | awk '{print NR, $0}' | column -t
+	echo -e "LINE\tTIMESTAMP\tMESSAGE"
+	journalctl --since "$start_date" --until "$end_date" | awk '{print NR "\t" $1 " " $2 "\t" substr($0, index($0,$3))}' | column -t
 }
 
 # Main logic
