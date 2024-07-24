@@ -21,8 +21,8 @@ Description=DevOps Info Fetch Service
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/devopsfetch -t '1 hour ago'
-Restart=on-failure
+ExecStart=/usr/local/bin/devopsfetch -t now now
+Restart=always
 User=root
 
 [Install]
